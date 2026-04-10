@@ -12,18 +12,15 @@ public class Hello {
 
         // ✅ Validasi config
         if (url == null || dbUser == null || dbPassword == null) {
-            System.err.println("Database configuration is missing.");
             return;
         }
 
         try (Scanner sc = new Scanner(System.in)) {
 
-            System.out.print("Enter username: ");
             String username = sc.nextLine();
 
             // ✅ Validasi input
             if (username == null || username.isBlank() || username.length() > 50) {
-                System.out.println("Invalid username.");
                 return;
             }
 
@@ -39,9 +36,7 @@ public class Hello {
 
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (rs.next()) {
-                        System.out.println("User found: " + rs.getString("username"));
                     } else {
-                        System.out.println("User not found.");
                     }
                 }
 
@@ -49,9 +44,7 @@ public class Hello {
 
         } catch (SQLException e) {
             // ❌ jangan print stacktrace ke user
-            System.err.println("Database error occurred.");
         } catch (Exception e) {
-            System.err.println("Unexpected error occurred.");
         }
     }
 }
