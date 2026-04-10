@@ -4,24 +4,33 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class Hello {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
-        Scanner sc = new Scanner(System.in);
-        String username = sc.nextLine();
+        String url = System.getenv("DB_URL");
+        String dbUser = System.getenv("DB_USER");
+        String dbPassword = System.getenv("DB_PASSWORD");
 
-        String password = "123456"; // issue
+        try (Scanner sc = new Scanner(System.in)) {
 
-        String query = "SELECT * FROM users WHERE username = '" + username + "'"; // SQL injection
+            System.out.print("Enter username: ");
+            String username = sc.nextLine();
 
-        Connection conn = DriverManager.getConnection(
-            "jdbc:postgresql://postgres:5432/sonarqube",
-            "sonar",
-            "sonar123"
-        );
+            String query = "SELECT * FROM users WHERE username = ?";
 
-        Statement stmt = conn.createStatement();
-        stmt.executeQuery(query);
+            try (Connection conn = DriverManager.getConnection(url, dbUser, dbPassword);
+                 PreparedStatement pstmt = conn.prepareStatement(query)) {
 
-        System.out.println(password);
+                pstmt.setString(1, username);
+
+                ResultSet rs = pstmt.executeQuery();
+
+                while (rs.next()) {
+                    System.out.println("User found: " + rs.getString("username"));
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
