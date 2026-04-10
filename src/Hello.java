@@ -10,27 +10,48 @@ public class Hello {
         String dbUser = System.getenv("DB_USER");
         String dbPassword = System.getenv("DB_PASSWORD");
 
+        // ✅ Validasi config
+        if (url == null || dbUser == null || dbPassword == null) {
+            System.err.println("Database configuration is missing.");
+            return;
+        }
+
         try (Scanner sc = new Scanner(System.in)) {
 
             System.out.print("Enter username: ");
             String username = sc.nextLine();
 
-            String query = "SELECT * FROM users WHERE username = ?";
+            // ✅ Validasi input
+            if (username == null || username.isBlank() || username.length() > 50) {
+                System.out.println("Invalid username.");
+                return;
+            }
+
+            String query = "SELECT username FROM users WHERE username = ?";
 
             try (Connection conn = DriverManager.getConnection(url, dbUser, dbPassword);
                  PreparedStatement pstmt = conn.prepareStatement(query)) {
 
+                // ✅ Timeout query (detik)
+                pstmt.setQueryTimeout(5);
+
                 pstmt.setString(1, username);
 
-                ResultSet rs = pstmt.executeQuery();
-
-                while (rs.next()) {
-                    System.out.println("User found: " + rs.getString("username"));
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        System.out.println("User found: " + rs.getString("username"));
+                    } else {
+                        System.out.println("User not found.");
+                    }
                 }
+
             }
 
+        } catch (SQLException e) {
+            // ❌ jangan print stacktrace ke user
+            System.err.println("Database error occurred.");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Unexpected error occurred.");
         }
     }
 }
