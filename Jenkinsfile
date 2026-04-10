@@ -16,7 +16,8 @@ pipeline {
                     sh '''
                     /opt/sonar-scanner/bin/sonar-scanner \
                     -Dsonar.projectKey=penjualan \
-                    -Dsonar.sources=.
+                    -Dsonar.sources=. \
+                    -Dsonar.token=squ_d7ed6d0c10446be8287b01b2660dada678e6469a
                     '''
                 }
             }
